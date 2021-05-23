@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OktaAuthService } from '@okta/okta-angular';
+import { CheckoutService } from 'src/app/services/checkout.service';
 
 @Component({
   selector: 'app-login-status',
@@ -11,7 +12,10 @@ export class LoginStatusComponent implements OnInit {
   isAuthenticated: boolean = false;
   userFullName!: string;
 
-  constructor(private oktaAuthService: OktaAuthService) {}
+  storage: Storage = sessionStorage;
+
+  constructor(private oktaAuthService: OktaAuthService,
+              private checkoutService: CheckoutService) {}
 
   ngOnInit(): void {
 
@@ -19,6 +23,7 @@ export class LoginStatusComponent implements OnInit {
     this.oktaAuthService.$authenticationState.subscribe (
       (result) => {
         this.isAuthenticated = result;
+        this.checkoutService.isAuthenticated = result;
         this.getUserDetails();
       }
     );
@@ -33,6 +38,14 @@ export class LoginStatusComponent implements OnInit {
       this.oktaAuthService.getUser().then(
         (res) => {
           this.userFullName = res.name!;
+          this.checkoutService.fName = res.given_name!;
+          this.checkoutService.lName = res.family_name!;
+          this.checkoutService.pEmail = res.email!;
+          //retrieve the user's email from authentication response
+          const theEmail = res.email;
+          
+          // store the email in the session storage
+          this.storage.setItem('userEmail', JSON.stringify(theEmail));
         }
       );
     }

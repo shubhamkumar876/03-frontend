@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { OktaAuthService } from '@okta/okta-angular';
 import { Country } from 'src/app/common/country';
 import { Order } from 'src/app/common/order';
 import { OrderItem } from 'src/app/common/order-item';
@@ -31,26 +32,30 @@ export class CheckoutComponent implements OnInit {
   shippingAddressStates: State[] = [];
   billingAddressStates: State[] = [];
 
+  isAuthenticated:Boolean = this.checkoutService.isAuthenticated;
+
 
   constructor(private formBuilder: FormBuilder,
               private checkoutFormService: CheckoutFormServiceService,
               private cartService: CartService,
               private checkoutService: CheckoutService,
-              private router: Router) { }
+              private router: Router) {}
 
   ngOnInit(): void {
 
     this.reviewCartstatus();
     this.cartService.computeCartTotals();
 
+    console.log("checkout isAuthenticated = " + this.isAuthenticated);
+
     ////////////////////////////////////////
     this.checkoutFormGroup = this.formBuilder.group ({
       customer: this.formBuilder.group({
-        firstName: new FormControl('', [Validators.required,Validators.minLength(3), 
+        firstName: new FormControl({value: this.checkoutService.fName, disabled: this.isAuthenticated}, [Validators.required,Validators.minLength(3), 
                                     ShopValidators.notOnlyWhitespace]),
-        lastName: new FormControl('', [Validators.required,Validators.minLength(3),
+        lastName: new FormControl({value: this.checkoutService.lName, disabled: this.isAuthenticated}, [Validators.required,Validators.minLength(3),
                                      ShopValidators.notOnlyWhitespace]),
-        email: new FormControl('', 
+        email: new FormControl({value: this.checkoutService.pEmail, disabled: this.isAuthenticated}, 
                                 [Validators.required,
                                   Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'),])
       }),

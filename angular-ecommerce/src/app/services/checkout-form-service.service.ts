@@ -10,8 +10,8 @@ import { State } from '../common/state';
 })
 export class CheckoutFormServiceService {
 
-  private countriesUrl = 'http://localhost:8080/api/countries';
-  private statesUrl = 'http://localhost:8080/api/states';
+  private countriesUrl = 'https://bestdealshop.herokuapp.com/api/countries';
+  private statesUrl = 'https://bestdealshop.herokuapp.com/api/states';
 
   constructor(private httpClient: HttpClient) { }
 
